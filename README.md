@@ -1,6 +1,7 @@
 Python version = 3.6.5
 
 Requirements
+```
 bandwidth-sdk==3.0.1
 certifi==2018.4.16
 chardet==3.0.4
@@ -12,15 +13,16 @@ pytz==2018.4
 requests==2.18.4
 six==1.11.0
 urllib3==1.22
+```
 
 This guide makes the following assumptions:
 
-You already have a Bandwidth account (https://dev.bandwidth.com/).
-You already have a Mailgun account (https://www.mailgun.com/).
-You already have a ngrok account (https://ngrok.com/).
-You have python3, pip, ngrok, and virtualenv installed on your system.
-You have purchased a Bandwidth number, and have a domain to use for Mailgun (Mailgun's default sandbox domain will be sufficient for a tutorial).
-You have an email address to use as your destination email.
+* You already have a Bandwidth account (https://dev.bandwidth.com/).
+* You already have a Mailgun account (https://www.mailgun.com/).
+* You already have a ngrok account (https://ngrok.com/).
+* You have python3, pip, ngrok, and virtualenv installed on your system.
+* You have purchased a Bandwidth number, and have a domain to use for Mailgun (Mailgun's default sandbox domain will be sufficient for a tutorial).
+* You have an email address to use as your destination email.
 
 This guide shows how to set up a bidirectional Email-SMS integration using
 the Bandwidth messaging API and the Mailgun API hosted locally using ngrok.
@@ -29,90 +31,95 @@ as an email to an email of your choice.  Replying to that email will send a text
 the contents of the reply.
 
 
-Step 1: Open up a ngrok instance
+# Step 1: Open up a ngrok instance
 
 Open up a terminal and execute the following command:
-ngrok http 8000
+
+`ngrok http 8000`
 
 Take note of the forwarding urls. You will need these later in the setup.
 Leave this terminal running, and continue the rest of this guide on a new terminal.
 
 
-Step 2: Set up the Python virtual environment
+# Step 2: Set up the Python virtual environment
 
 Open up a new terminal.  Create a new Python virtual environment by executing the following command:
-virtualenv -p python3 <path_to_virtual_environment>
+
+`virtualenv -p python3 <path_to_virtual_environment>`
 
 Activate the virtual environment by executing the following command:
-source <path_to_virtual_environment>/bin/activate
+`source <path_to_virtual_environment>/bin/activate`
 
 Your terminal should show the name of your virtual environment on the prompt.
 
 Run the following commands to install the project requirements via pip:
+
+```
 pip install django
 pip install bandwidth-sdk
 pip install requests
+```
 
-
-Step 3: Clone the project repo locally
+# Step 3: Clone the project repo locally
 
 Execute the following commands:
-git clone <>
-cd <>
+```
+git clone https://github.com/jmulford-bandwidth/Email-SMS-Integration.git
+cd Email-SMS-Integration
+```
 
 
-Step 4: Set up a Bandwidth app to make POST requests on your server
+# Step 4: Set up a Bandwidth app to make POST requests on your server
 
-Go to app.bandwidth.com.
-Login to your account.
-Go to the 'Applications' tab.
-Click '+ Create New' button (top left of the page if you already have an app, otherwise in the center of the page).
-Name your application whatever you want (I would suggest something related to email-sms-integration).
-Set the 'Callback request method' to POST.
-Set the 'Application Type' to 'Messaging'.
-Set the 'Messaging callback URL' to '<your_ngrok_url>/send_mailgun_email/'.
-Click the 'Create' button.
-Go to the 'Numbers' tab.
-Assign one of your Bandwidth numbers to your new Bandwith application.  This is the number that your end users will text.
-
-
-Step 5: Set up a Mailgun route to make POST requests on your server
-
-Go to app.mailgun.com.
-Login to your account.
-Go to the 'Routes' tab.
-Click 'Create Route'.
-Under 'Expression Type', select 'Match Recipient'.
-In the 'Recipient' box, type '.*@<your_domain_name>'.
-    Note: If your domain name will be used for more than just this email-sms
-    integration, you may want a more sophisticated regular expression.  If you
-    are using this domain only for the email-sms integration, the catch-all expression
-    will be sufficient.
-Under 'Actions', select 'Forward'.
-In the 'Forward' box, type '<your_ngrok_url>/send_bandwidth_message/'.
-Click the 'Create Route' button.
+1. Go to app.bandwidth.com.
+2. Login to your account.
+3. Go to the 'Applications' tab.
+4. Click '+ Create New' button (top left of the page if you already have an app, otherwise in the center of the page).
+5. Name your application whatever you want (I would suggest something related to email-sms-integration).
+6. Set the 'Callback request method' to POST.
+7. Set the 'Application Type' to 'Messaging'.
+8. In the 'Messaging callback URL' box, type `<your_ngrok_url>/send_mailgun_email/`.
+9. Click the 'Create' button.
+10. Go to the 'Numbers' tab.
+11. Assign one of your Bandwidth numbers to your new Bandwith application.  This is the number that your end users will text.
 
 
-Step 6: Assign environment variables
+# Step 5: Set up a Mailgun route to make POST requests on your server
+
+1. Go to app.mailgun.com.
+2. Login to your account.
+3. Go to the 'Routes' tab.
+4. Click 'Create Route'.
+5. Under 'Expression Type', select 'Match Recipient'.
+6. In the 'Recipient' box, type `.*@<your_domain_name>`.
+    * Note: If your domain name will be used for more than just this email-sms integration, you may want a more sophisticated regular expression.  If you are using this domain only for the email-sms integration, the catch-all expression will be sufficient.
+7. Under 'Actions', select 'Forward'.
+8. In the 'Forward' box, type `<your_ngrok_url>/send_bandwidth_message/`.
+9. Click the 'Create Route' button.
+
+
+# Step 6: Assign environment variables
 
 The following environment variables need to be assigned:
-DJANGO_SECRET_KEY
-HOST_URL
-BANDWIDTH_USER_ID
-BANDWIDTH_API_TOKEN
-BANDWIDTH_API_SECRET
-BANDWIDTH_NUMBER
-MAILGUN_API_KEY
-MAILGUN_EMAIL_DOMAIN
-DESTINATION_EMAIL
-DEBUG
+* DJANGO_SECRET_KEY
+* HOST_URL
+* BANDWIDTH_USER_ID
+* BANDWIDTH_API_TOKEN
+* BANDWIDTH_API_SECRET
+* BANDWIDTH_NUMBER
+* MAILGUN_API_KEY
+* MAILGUN_EMAIL_DOMAIN
+* DESTINATION_EMAIL
+* DEBUG
 
 A django secret key can be generated by executing the following in a Python shell:
 
+```
 >>>from django.core.management import utils
 >>>utils.get_random_secret_key()
 <secret key>
 >>>
+```
 
 For using ngrok, HOST_URL is found on your terminal running the ngrok session.  Do not include the
 'http://' or 'http://' part of the url (Note: you do include the 'http://' or 'https://' parts
@@ -129,13 +136,14 @@ DESTINATION_EMAIL is the email (personal, business, etc.) that you want to recei
 Set DEBUG to False
 
 
-Step 7: Start the server
+# Step 7: Start the server
 
 Execute the following command
 python manage.py runserver
 
 If you set your environment variables properly, you should see this:
 
+```
 Performing system checks...
 
 System check identified no issues (0 silenced).
@@ -143,7 +151,7 @@ June 07, 2018 - 20:25:02
 Django version 2.0.6, using settings 'email_sms_integration.settings'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
-
+```
 
 You can now text your Bandwidth number, and you should receive an email from your Mailgun domain on your
 destination email.  Replying to this email will send a reply text to the initial sender.
