@@ -48,6 +48,7 @@ Open up a new terminal.  Create a new Python virtual environment by executing th
 `virtualenv -p python3 <path_to_virtual_environment>`
 
 Activate the virtual environment by executing the following command:
+
 `source <path_to_virtual_environment>/bin/activate`
 
 Your terminal should show the name of your virtual environment on the prompt.
